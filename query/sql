@@ -1,0 +1,269 @@
+Querys del SISTEMA:
+
+
+SELECT * FROM t_cat_roles;
+
+-- Encriptaciones de Claves
+select sha1('admin'); -> 'd033e22ae348aeb5660fc2140aec35850c4da997'
+select sha1('cliente'); -> 'd94019fd760a71edf11844bb5c601a4de95aacaf'
+
+SELECT * FROM helpdesk.t_persona;
+
+SELECT * FROM helpdesk.t_usuarios;
+
+SELECT * FROM helpdesk.t_asignacion;
+
+SELECT * FROM helpdesk.t_reportes;
+
+DROP TABLE helpdesk.t_reportes;
+
+desc helpdesk.t_asignacion;
+
+SELECT * FROM helpdesk.t_cat_equipo;
+
+ALTER TABLE helpdesk.t_usuarios ADD COLUMN activo INT NOT NULL DEFAULT 1 AFTER ubicacion;
+
+ALTER TABLE helpdesk.t_usuarios CHANGE COLUMN fecha_insert fecha_insert VARCHAR(45) NOT NULL;
+
+CREATE TABLE helpdesk.t_cat_equipo (
+    id_equipo INT NOT NULL AUTO_INCREMENT,
+    nombre VARCHAR(245) NOT NULL,
+    descripcion VARCHAR(245) NOT NULL,
+    PRIMARY KEY (id_equipo)
+);
+
+SELECT 
+    persona.id_persona,
+    CONCAT(persona.paterno,
+            ' ',
+            persona.materno,
+            ' ',
+            persona.nombre) AS nombrePersona
+FROM
+    helpdesk.t_persona AS persona
+        INNER JOIN
+    helpdesk.t_usuarios AS usuario ON persona.id_persona = usuario.id_persona
+        AND usuario.id_rol = 1
+ORDER BY persona.paterno
+
+CREATE TABLE helpdesk.t_asignacion (
+    id_asignacion INT NOT NULL AUTO_INCREMENT,
+    id_persona INT NOT NULL,
+    id_equipo INT NOT NULL,
+    marca VARCHAR(245)NULL,
+    modelo VARCHAR(245)NULL,
+    color VARCHAR(245)NULL,
+    descripcion VARCHAR(245)NULL,
+    memoria VARCHAR(245)NULL,
+    disco_duro VARCHAR(245)NULL,
+    procesador VARCHAR(245)NULL,
+  PRIMARY KEY (id_asignacion));
+  
+  ALTER TABLE helpdesk.t_asignacion
+ADD INDEX fkpersonaAsignacion_idx (id_persona ASC);
+;
+ALTER TABLE helpdesk.t_asignacion
+ADD CONSTRAINT fkpersonaAsignacion
+	FOREIGN KEY (id_persona)
+	REFERENCES helpdesk.t_persona (id_persona)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION;
+    
+ALTER TABLE helpdesk.t_asignacion
+ADD INDEX fkequiposAsignacion_idx (id_equipo ASC);
+;
+ALTER TABLE helpdesk.t_asignacion
+ADD CONSTRAINT fkequiposAsignacion
+	FOREIGN KEY (id_equipo)
+	REFERENCES helpdesk.t_cat_equipo (id_equipo)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION;
+    
+SELECT 
+    CONCAT(persona.paterno,
+            ' ',
+            persona.materno,
+            ' ',
+            persona.nombre) AS nombrePersona,
+            equipo.id_equipo as idEquipo,
+            equipo.nombre as nombreEquipo,
+            asignacion.id_asignacion as idAsignacion,
+            asignacion.marca,
+            asignacion.modelo,
+            asignacion.color,
+            asignacion.descripcion,
+            asignacion.memoria,
+            asignacion.disco_duro,
+            asignacion.procesador
+FROM
+    helpdesk.t_asignacion AS asignacion
+        INNER JOIN
+    helpdesk.t_persona AS persona ON asignacion.id_persona = persona.id_persona
+        INNER JOIN
+    helpdesk.t_cat_equipo AS equipo ON asignacion.id_equipo = equipo.id_equipo;
+    
+    
+    
+SELECT 
+    persona.id_persona AS idPersona,
+    CONCAT(persona.paterno,
+            ' ',
+            persona.materno,
+            ' ',
+            persona.nombre) AS nombrePersona,
+    equipo.id_equipo AS idEquipo,
+    equipo.nombre AS nombreEquipo,
+    asignacion.id_asignacion AS idAsignacion,
+    asignacion.marca AS marca,
+    asignacion.modelo AS modelo,
+    asignacion.color AS color,
+    asignacion.descripcion AS descripcion,
+    asignacion.memoria AS memoria,
+    asignacion.disco_duro AS discoDuro,
+    asignacion.procesador AS procesador
+FROM
+    helpdesk.t_asignacion AS asignacion
+        INNER JOIN
+    helpdesk.t_persona AS persona ON asignacion.id_persona = persona.id_persona
+        INNER JOIN
+    helpdesk.t_cat_equipo AS equipo ON asignacion.id_equipo = equipo.id_equipo
+        AND asignacion.id_persona = 1;
+        
+        
+        
+SELECT 
+    persona.id_persona AS idPersona
+FROM
+    helpdesk.t_usuarios AS usuario
+        INNER JOIN
+    helpdesk.t_persona AS persona ON usuario.id_persona = persona.id_persona
+        AND usuario.id_usuario = 1;
+        
+
+CREATE TABLE helpdesk.t_reportes (
+    id_reporte INT NOT NULL AUTO_INCREMENT,
+    id_usuario INT NULL,
+    id_equipo INT NULL,
+    descripcion TEXT NULL,
+    PRIMARY KEY (id_reporte),
+    INDEX fkUsuarioReporte_idx (id_usuario ASC),
+    INDEX fkEquipoReporte_idx (id_equipo ASC),
+    CONSTRAINT fkUsuarioReporte FOREIGN KEY (id_usuario)
+        REFERENCES helpdesk.t_usuarios (id_usuario)
+        ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT fkEquipoReporte FOREIGN KEY (id_equipo)
+        REFERENCES helpdesk.t_cat_equipo (id_equipo)
+        ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+    
+
+ALTER TABLE helpdesk.t_reportes
+   DROP FOREIGN KEY fkEquipoReporte,
+   DROP FOREIGN KEY fkUsuarioReporte;
+ALTER TABLE helpdesk.t_reportes
+   ADD COLUMN id_usuario_tecnico INT NULL AFTER id_equipo,
+   ADD COLUMN solucion_problema TEXT NULL AFTER descripcion_problema,
+   ADD COLUMN estatus INT NOT NULL AFTER solucion_problema,
+       CHANGE COLUMN id_usuario id_usuario INT(11) NOT NULL,
+       CHANGE COLUMN id_equipo id_equipo INT(11) NOT NULL,
+       CHANGE COLUMN descripcion descripcion_problema TEXT NOT NULL;
+
+ALTER TABLE helpdesk.t_reportes
+ADD CONSTRAINT fkEquipoReporte
+   FOREIGN KEY (id_equipo)
+   REFERENCES helpdesk.t_cat_equipo (id_equipo)
+   ON DELETE NO ACTION
+   ON UPDATE NO ACTION,
+ADD CONSTRAINT fkUsuarioReporte
+   FOREIGN KEY (id_usuario)
+   REFERENCES helpdesk.t_usuarios (id_usuario)
+   ON DELETE NO ACTION
+   ON UPDATE NO ACTION;
+   
+ALTER TABLE helpdesk.t_reportes
+ADD COLUMN fecha DATETIME NOT NULL DEFAULT now() AFTER estatus;
+
+
+SELECT 
+    reporte.id_reporte AS idReporte,
+    reporte.id_usuario AS idUsuario,
+    CONCAT(persona.paterno,
+            ' ',
+            persona.materno,
+            ' ',
+            persona.nombre) AS nombrePersona,
+    equipo.id_equipo AS idEquipo,
+    equipo.nombre AS nombreEquipo,
+    reporte.descripcion_problema,
+    reporte.estatus,
+    reporte.solucion_problema,
+    reporte.fecha
+FROM
+    helpdesk.t_reportes AS reporte
+        INNER JOIN
+    helpdesk.t_usuarios AS usuario ON reporte.id_usuario = usuario.id_usuario
+        INNER JOIN
+    helpdesk.t_persona AS persona ON usuario.id_persona = persona.id_persona
+        INNER JOIN
+    helpdesk.t_cat_equipo AS equipo ON reporte.id_equipo = equipo.id_equipo
+        AND reporte.id_usuario = '1';
+        
+
+SELECT 
+    asignacion.id_asignacion, equipo.id_equipo, equipo.nombre
+FROM
+    helpdesk.t_asignacion AS asignacion
+        INNER JOIN
+    helpdesk.t_cat_equipo AS equipo ON asignacion.id_equipo = equipo.id_equipo
+WHERE
+    asignacion.id_persona = (SELECT 
+            id_persona
+        FROM
+            helpdesk.t_usuarios
+        WHERE
+            id_usuario = 1);
+    
+    
+ALTER TABLE helpdesk.t_reportes
+	CHANGE COLUMN estatus estatus INT(11) NOT NULL DEFAULT 1;
+	
+
+
+Query para crear tabla de Asignacion de Dispositivos:
+
+
+CREATE TABLE helpdesk.t_asignacion (
+    id_asignacion INT NOT NULL AUTO_INCREMENT,
+    id_persona INT NOT NULL,
+    id_equipo INT NOT NULL,
+    marca VARCHAR(245)NULL,
+    modelo VARCHAR(245)NULL,
+    color VARCHAR(245)NULL,
+    descripcion VARCHAR(245)NULL,
+    memoria VARCHAR(245)NULL,
+    disco_duro VARCHAR(245)NULL,
+    procesador VARCHAR(245)NULL,
+  PRIMARY KEY (id_asignacion));
+  
+  
+ALTER TABLE helpdesk.t_asignacion
+ADD INDEX fkpersonaAsignacion_idx (id_persona ASC);
+;
+ALTER TABLE helpdesk.t_asignacion
+ADD CONSTRAINT fkpersonaAsignacion
+	FOREIGN KEY (id_persona)
+	REFERENCES helpdesk.t_persona (id_persona)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION;
+	
+
+ALTER TABLE helpdesk.t_asignacion
+ADD INDEX fkequiposAsignacion_idx (id_equipo ASC);
+;
+ALTER TABLE helpdesk.t_asignacion
+ADD CONSTRAINT fkequiposAsignacion
+	FOREIGN KEY (id_equipo)
+	REFERENCES helpdesk.t_cat_equipo (id_equipo)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION;
+
