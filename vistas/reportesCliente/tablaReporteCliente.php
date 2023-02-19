@@ -56,7 +56,7 @@
             <td>
                 <?php
                     $estatus = $mostrar['estatus'];
-                    $cadenaEstatus = '<span class="badge badge-success">Abierto</span>';
+                    $cadenaEstatus = '<span class="badge badge-danger">Abierto</span>';
                     if($estatus == 0){
                         $cadenaEstatus = '<span class="badge badge-success">Cerrado</span>';
                     }
@@ -84,6 +84,40 @@
 
 <script>
     $(document).ready(function(){
-        $('#tablaReportesClienteDataTable').DataTable();
+        $('#tablaReportesClienteDataTable').DataTable({
+            language : {
+                url : "../public/datatable/es-ES.json"
+            },
+            dom: 'Bfrtip',
+            buttons : {
+                buttons : [
+                    { 
+                        extend : 'copy', 
+                        className : 'btn btn-outline-info',
+                        text : '<i class="far fa-copy"></i> Copiar'
+                    },
+                    { 
+                        extend : 'csv', 
+                        className : 'btn btn-outline-primary',
+                        text : '<i class="fas fa-file-csv"></i> CSV'
+                    },
+                    { 
+                        extend : 'excel', 
+                        className : 'btn btn-outline-success',
+                        text : '<i class="fas fa-file-excel"></i> XLS'
+                    },
+                    { 
+                        extend : 'pdf', 
+                        className : 'btn btn-outline-danger',
+                        text : '<i class="fas fa-file-pdf"></i> PDF'
+                    },
+                ],
+                dom : {
+                    button : {
+                        className : 'btn'
+                    }
+                }
+            }
+        });
     });
 </script>

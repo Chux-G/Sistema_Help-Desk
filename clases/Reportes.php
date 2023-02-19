@@ -26,4 +26,39 @@
             $query->close();
             return $respuesta;
         }
+
+        public function obtenerSolucion($idReporte) {
+            $conexion = Conexion::conectar();
+            $sql = "SELECT solucion_problema, estatus 
+                FROM helpdesk.t_reportes 
+                WHERE id_reporte = '$idReporte'";
+            $respuesta = mysqli_query($conexion, $sql);
+            $reporte = mysqli_fetch_array($respuesta);
+
+            $datos = array(
+                "idReporte" => $idReporte,
+                "estatus" => $reporte['estatus'],
+                "solucion" => $reporte['solucion_problema']
+            );
+
+            return $datos;
+        }
+
+        public function actualizarSolucion($datos) {
+            $conexion = Conexion::conectar();
+            $sql = "UPDATE helpdesk.t_reportes 
+                    SET id_usuario_tecnico = ?,
+                        solucion_problema = ?,
+                        estatus = ?
+                    WHERE id_reporte = ?";
+            $query = $conexion->prepare($sql);
+            $query->bind_param('isii', $datos['idUsuario'],
+                                        $datos['solucion'],
+                                        $datos['estatus'],
+                                        $datos['idReporte']);
+            $respuesta = $query->execute();
+            $query->close();
+
+            return $respuesta;
+        }
     }

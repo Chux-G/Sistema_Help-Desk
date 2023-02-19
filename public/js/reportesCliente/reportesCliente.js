@@ -24,7 +24,7 @@ function agregarNuevoReporte() {
 }
 
 
-function eliminarReporteCliente(idReporte) {
+function eliminarReporteAdmin(idReporte) {
     Swal.fire({
         title: 'Estas seguro de eliminar este reporte?',
         text: "Una vez eliminado no podra ser recuperado!",

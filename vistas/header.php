@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="../public/datatable/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="../public/datatable/responsive.bootstrap4.min.css">
     <link rel="stylesheet" href="../public/fontawesome/css/all.css">
+    <link rel="stylesheet" href="../public/datatable/buttons.dataTables.min.css">
     <title>
         Asistencia Técnica
     </title>
@@ -25,7 +26,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light static-top mb-5 shadow">
         <div class="container">
             <a class="navbar-brand" href="inicio.php">
-                Soporte Técnico
+            <span class="fas fa-wrench"></span> Soporte Técnico
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -73,12 +74,23 @@
                         <span class="fas fa-user-tie"></span> Usuario: <?php echo $_SESSION['usuario']['nombre'];?>
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="#">Editar Datos</a></li>
+                        <li><a class="dropdown-item" href="#" 
+                                data-toggle="modal" 
+                                data-target="#modalActualizarDatosPersonales"
+                                onclick="return obtenerDatosPersonalesInicio('<?php echo $_SESSION['usuario']['id']; ?>')">
+                            <span class="fas fa-user-check"></span>  Editar Datos
+                        </a></li>
                         <!--<li><hr class="dropdown-divider"></li>-->
-                        <li><a class="dropdown-item" href="../procesos/usuarios/login/salir.php">Salir</a></li>
+                        <li><a class="dropdown-item" href="../procesos/usuarios/login/salir.php">
+                            <span class="fas fa-power-off"></span>  Salir
+                        </a></li>
                     </ul>
             </li>
             </ul>
             </div>
         </div>
     </nav>
+
+    <?php
+        include "inicio/modalActualizarDatosPersonales.php";
+    ?>

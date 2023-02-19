@@ -26,7 +26,8 @@
                     INNER JOIN
                 helpdesk.t_persona AS persona ON usuario.id_persona = persona.id_persona
                     INNER JOIN
-                helpdesk.t_cat_equipo AS equipo ON reporte.id_equipo = equipo.id_equipo";
+                helpdesk.t_cat_equipo AS equipo ON reporte.id_equipo = equipo.id_equipo
+                ORDER BY reporte.fecha DESC";
         
         $respuesta = mysqli_query($conexion, $sql);
 ?>
@@ -55,7 +56,7 @@
             <td>
                 <?php
                     $estatus = $mostrar['estatus'];
-                    $cadenaEstatus = '<span class="badge badge-success">Abierto</span>';
+                    $cadenaEstatus = '<span class="badge badge-danger">Abierto</span>';
                     if($estatus == 0){
                         $cadenaEstatus = '<span class="badge badge-success">Cerrado</span>';
                     }
@@ -63,13 +64,20 @@
                     echo $cadenaEstatus;
                 ?>
             </td>
-            <td><?php echo $mostrar['solucion']?></td>
+            <td>
+                <button class="btn btn-info btn-sm" 
+                        onclick="obtenerDatosSolucion('<?php echo $mostrar['idReporte'];?>')"
+                        data-toggle="modal" data-target="#modalAgregarSolucionReporte">
+                        <span class="fas fa-check"></span>
+                </button>
+                <?php echo $mostrar['solucion']?>
+            </td>
             <td>
                 <?php
                     if($mostrar['solucion'] == "") {
                 ?>
                         <button class="btn btn-danger btn-sm" 
-                            onclick="eliminarReporteCliente(<?php echo $mostrar['idReporte']?>)">
+                            onclick="eliminarReporteAdmin(<?php echo $mostrar['idReporte']?>)">
                             Eliminar
                         </button>
                 <?php
@@ -83,6 +91,40 @@
 
 <script>
     $(document).ready(function(){
-        $('#tablaReportesAdminDataTable').DataTable();
+        $('#tablaReportesAdminDataTable').DataTable({
+            language : {
+                url : "../public/datatable/es-ES.json"
+            },
+            dom: 'Bfrtip',
+            buttons : {
+                buttons : [
+                    { 
+                        extend : 'copy', 
+                        className : 'btn btn-outline-info',
+                        text : '<i class="far fa-copy"></i> Copiar'
+                    },
+                    { 
+                        extend : 'csv', 
+                        className : 'btn btn-outline-primary',
+                        text : '<i class="fas fa-file-csv"></i> CSV'
+                    },
+                    { 
+                        extend : 'excel', 
+                        className : 'btn btn-outline-success',
+                        text : '<i class="fas fa-file-excel"></i> XLS'
+                    },
+                    { 
+                        extend : 'pdf', 
+                        className : 'btn btn-outline-danger',
+                        text : '<i class="fas fa-file-pdf"></i> PDF'
+                    },
+                ],
+                dom : {
+                    button : {
+                        className : 'btn'
+                    }
+                }
+            }
+        });
     });
 </script>

@@ -69,6 +69,10 @@
 
 <script>
     $(document).ready(function(){
-        $('#tablaAsignacionDataTable').DataTable();
+        $('#tablaAsignacionDataTable').DataTable({
+            language : {
+                url : "../public/datatable/es-ES.json"
+            }
+        });
     });
 </script>
